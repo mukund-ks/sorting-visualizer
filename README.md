@@ -1,2 +1,2 @@
 # Sorting Visualizer
- A Simple Algorithm Visualizer, coded in Python.
+ A Simple Sorting Visualizer, coded in Python.
