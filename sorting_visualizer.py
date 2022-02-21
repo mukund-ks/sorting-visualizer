@@ -7,8 +7,10 @@ class Drawing:
     WHITE = 255,255,255
     GREEN = 0,255,0
     RED = 255,0,0
-    GREY = 128,128,128
-    BACKGROUND_COLOR = WHITE
+    BACKGROUND_COLOR = 178,223,238
+    
+    GRADIENT = [(159,121,238),(137,104,205),(93,71,139)]
+    
     SIDE_PADDING = 100
     TOP_PADDING = 150
         
@@ -28,7 +30,23 @@ class Drawing:
         self.blk_width = (self.width - self.SIDE_PADDING) // len(li)
         self.blk_height = (self.height - self.TOP_PADDING) // (self.max_vl - self.min_vl)
         self.start_x = self.SIDE_PADDING // 2
+
+def draw(draw_win):
+    draw_win.window.fill(draw_win.BACKGROUND_COLOR)
+    draw_list(draw_win)
+    pygame.display.update()
+
+def draw_list(draw_win):
+    li = draw_win.li
+    
+    for i,vl in enumerate(li):
+        x = draw_win.start_x + i * draw_win.blk_width
+        y = draw_win.height - (vl - draw_win.min_vl) * draw_win.blk_height
         
+        color = draw_win.GRADIENT[i%3]
+        
+        pygame.draw.rect(draw_win.window, color, (x,y, draw_win.blk_width, draw_win.height))
+
 def gen_starting_li(n, min_vl, max_vl):
     li = []
     
@@ -48,10 +66,12 @@ def main():
     
     li = gen_starting_li(n, min_vl, max_vl)
     
-    draw = Drawing(800,600,li)
+    draw_win = Drawing(800,600,li)
     
     while run:
         clock.tick(60)
+        
+        draw(draw_win)
         
         pygame.display.update()
         
