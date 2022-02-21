@@ -8,6 +8,8 @@ class Drawing:
     GREEN = 0,255,0
     RED = 255,0,0
     BACKGROUND_COLOR = 178,223,238
+    FONT = pygame.font.SysFont('arial', 20)
+    LARGE_FONT = pygame.font.SysFont('arial', 40)
     
     GRADIENT = [(159,121,238),(137,104,205),(93,71,139)]
     
@@ -33,6 +35,13 @@ class Drawing:
 
 def draw(draw_win):
     draw_win.window.fill(draw_win.BACKGROUND_COLOR)
+    
+    controls = draw_win.FONT.render("R - Reset | SPACE - Start Sorting | A - Ascending | D - Descending", 1, draw_win.BLACK)
+    draw_win.window.blit(controls, (draw_win.width/2 - controls.get_width()/2, 5))
+    
+    sorting = draw_win.FONT.render("I - Insertion Sort | B - Bubble Sort ", 1, draw_win.BLACK)
+    draw_win.window.blit(sorting, (draw_win.width/2 - sorting.get_width()/2, 35))
+    
     draw_list(draw_win)
     pygame.display.update()
 
@@ -65,6 +74,8 @@ def main():
     max_vl = 100
     
     li = gen_starting_li(n, min_vl, max_vl)
+    sorting = False
+    ascending = bool()
     
     draw_win = Drawing(800,600,li)
     
@@ -78,7 +89,24 @@ def main():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
+            
+            if event.type != pygame.KEYDOWN:
+                continue
+            
+            if event.key == pygame.K_r:
+                li = gen_starting_li(n, min_vl, max_vl)
+                draw_win.set_list(li)
+                sorting = False
                 
+            elif event.key == pygame.K_SPACE and sorting == False:
+                sorting = True
+            
+            elif event.key == pygame.K_a and not sorting:
+                ascending = True
+            
+            elif event.key == pygame.K_d and not sorting:
+                ascending = False
+
     pygame.quit()
     
 if __name__=='__main__':
