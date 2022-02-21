@@ -45,8 +45,13 @@ def draw(draw_win):
     draw_list(draw_win)
     pygame.display.update()
 
-def draw_list(draw_win):
+def draw_list(draw_win, color_positions={}, clear_background=False):
     li = draw_win.li
+    
+    if clear_background:
+        clear_rect = (draw_win.SIDE_PADDING//2, draw_win.TOP_PADDING, draw_win.width - draw_win.SIDE_PADDING, draw_win.height - draw_win.TOP_PADDING)
+        
+        pygame.draw.rect(draw_win.window, draw_win.BACKGROUND_COLOR, clear_rect)
     
     for i,vl in enumerate(li):
         x = draw_win.start_x + i * draw_win.blk_width
@@ -54,7 +59,13 @@ def draw_list(draw_win):
         
         color = draw_win.GRADIENT[i%3]
         
+        if i in color_positions:
+            color = color_positions[i]
+        
         pygame.draw.rect(draw_win.window, color, (x,y, draw_win.blk_width, draw_win.height))
+    
+    if clear_background:
+        pygame.display.update()
 
 def gen_starting_li(n, min_vl, max_vl):
     li = []
@@ -63,6 +74,20 @@ def gen_starting_li(n, min_vl, max_vl):
         vl = random.randint(min_vl,max_vl)
         li.append(vl)
         
+    return li
+
+def bubble_sort(draw_win, ascending=True):
+    li = draw_win.li
+    
+    for i in range(len(li)-1):
+        for j in range(len(li)-1-i):
+            num1 = li[j]
+            num2 = li[j+1]
+            
+            if (num1 > num2 and ascending) or (num1 < num2 and not ascending):
+                li[j], li[j+1] = li[j+1], li[j]
+                draw_list(draw_win,{j: draw_win.GREEN, j+1: draw_win.RED}, True)
+                yield True
     return li
 
 def main():
@@ -77,14 +102,22 @@ def main():
     sorting = False
     ascending = bool()
     
+    sorting_algo = bubble_sort
+    sorting_algo_name = "Bubble Sort"
+    sorting_algo_gen = None
+    
     draw_win = Drawing(800,600,li)
     
     while run:
         clock.tick(60)
         
-        draw(draw_win)
-        
-        pygame.display.update()
+        if sorting:
+            try:
+                next(sorting_algo_gen)
+            except StopIteration:
+                sorting = False
+        else:
+            draw(draw_win)
         
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -100,6 +133,7 @@ def main():
                 
             elif event.key == pygame.K_SPACE and sorting == False:
                 sorting = True
+                sorting_algo_gen = sorting_algo(draw_win, ascending)
             
             elif event.key == pygame.K_a and not sorting:
                 ascending = True
