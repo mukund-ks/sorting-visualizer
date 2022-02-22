@@ -42,7 +42,7 @@ def draw(draw_win, sorting_algo_name, ascending):
     controls = draw_win.FONT.render("R - Reset | SPACE - Start Sorting | A - Ascending | D - Descending", 1, draw_win.BLACK)
     draw_win.window.blit(controls, (draw_win.width/2 - controls.get_width()/2, 55))
     
-    sorting = draw_win.FONT.render("I - Insertion Sort | B - Bubble Sort ", 1, draw_win.BLACK)
+    sorting = draw_win.FONT.render("RIGHT ARROW- Insertion Sort | LEFT ARROW - Bubble Sort ", 1, draw_win.BLACK)
     draw_win.window.blit(sorting, (draw_win.width/2 - sorting.get_width()/2, 85))
     
     draw_list(draw_win)
@@ -73,7 +73,7 @@ def draw_list(draw_win, color_positions={}, clear_background=False):
 def gen_starting_li(n, min_vl, max_vl):
     li = []
     
-    for i in range(n):
+    for _ in range(n):
         vl = random.randint(min_vl,max_vl)
         li.append(vl)
         
@@ -93,6 +93,27 @@ def bubble_sort(draw_win, ascending=True):
                 yield True
     return li
 
+def insertion_sort(draw_win, ascending=True):
+	li = draw_win.li
+
+	for i in range(1, len(li)):
+		current = li[i]
+
+		while True:
+			ascending_sort = i > 0 and li[i - 1] > current and ascending
+			descending_sort = i > 0 and li[i - 1] < current and not ascending
+
+			if not ascending_sort and not descending_sort:
+				break
+
+			li[i] = li[i - 1]
+			i = i - 1
+			li[i] = current
+			draw_list(draw_win, {i - 1: draw_win.GREEN, i: draw_win.RED}, True)
+			yield True
+
+	return li
+
 def main():
     run = True
     clock = pygame.time.Clock()
@@ -102,17 +123,16 @@ def main():
     max_vl = 100
     
     li = gen_starting_li(n, min_vl, max_vl)
+    draw_win = Drawing(800,600,li)
     sorting = False
-    ascending = bool()
+    ascending = True
     
     sorting_algo = bubble_sort
     sorting_algo_name = "Bubble Sort"
     sorting_algo_gen = None
     
-    draw_win = Drawing(800,600,li)
-    
     while run:
-        clock.tick(240) # increase this number to have the algorithm function at a higher speed.
+        clock.tick(120) # increase this number to have the algorithm function at a higher speed.
         
         if sorting:
             try:
@@ -143,7 +163,14 @@ def main():
             
             elif event.key == pygame.K_d and not sorting:
                 ascending = False
-
+                
+            elif event.key == pygame.K_LEFT and not sorting:
+                sorting_algo = bubble_sort
+                sorting_algo_name = 'Bubble Sort'
+                
+            elif event.key == pygame.K_RIGHT and not sorting:
+                sorting_algo = insertion_sort
+                sorting_algo_name = 'Insertion Sort'
     pygame.quit()
     
 if __name__=='__main__':
