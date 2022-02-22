@@ -33,14 +33,17 @@ class Drawing:
         self.blk_height = (self.height - self.TOP_PADDING) // (self.max_vl - self.min_vl)
         self.start_x = self.SIDE_PADDING // 2
 
-def draw(draw_win):
+def draw(draw_win, sorting_algo_name, ascending):
     draw_win.window.fill(draw_win.BACKGROUND_COLOR)
     
+    title = draw_win.LARGE_FONT.render(f"{sorting_algo_name} - {'Ascending' if ascending else 'Descending'}", 1, draw_win.BLACK)
+    draw_win.window.blit(title, (draw_win.width/2 - title.get_width()/2, 5))
+    
     controls = draw_win.FONT.render("R - Reset | SPACE - Start Sorting | A - Ascending | D - Descending", 1, draw_win.BLACK)
-    draw_win.window.blit(controls, (draw_win.width/2 - controls.get_width()/2, 5))
+    draw_win.window.blit(controls, (draw_win.width/2 - controls.get_width()/2, 55))
     
     sorting = draw_win.FONT.render("I - Insertion Sort | B - Bubble Sort ", 1, draw_win.BLACK)
-    draw_win.window.blit(sorting, (draw_win.width/2 - sorting.get_width()/2, 35))
+    draw_win.window.blit(sorting, (draw_win.width/2 - sorting.get_width()/2, 85))
     
     draw_list(draw_win)
     pygame.display.update()
@@ -109,7 +112,7 @@ def main():
     draw_win = Drawing(800,600,li)
     
     while run:
-        clock.tick(60)
+        clock.tick(240) # increase this number to have the algorithm function at a higher speed.
         
         if sorting:
             try:
@@ -117,7 +120,7 @@ def main():
             except StopIteration:
                 sorting = False
         else:
-            draw(draw_win)
+            draw(draw_win, sorting_algo_name, ascending)
         
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
